@@ -29,6 +29,7 @@ public class Main {
 
 
             //Limpiamos la base de datos
+            deleteTable("pago");
             deleteTable("se_inscribe");
             deleteTable("pertenece");
             deleteTable("cronograma");
@@ -38,17 +39,12 @@ public class Main {
             deleteTable("profesional");
             deleteTable("actividad_arancelada");
             deleteTable("actividad");
-//            deleteTable("grupo_familiar");
+
             deleteTable("socio_titular");
             deleteTable("socio");
             deleteTable("categoria");
-            //Falta indicar orden inverso al de creacion
 
 
-//            deleteTable("cuota_social");
-//            deleteTable("pago");
-//            deleteTable("socio");
-//            deleteTable("grupo_familiar");
 
 //            //Creamos las categorias
             cargarCategoria("infantiles", 1000);
@@ -137,32 +133,61 @@ public class Main {
                 cargarPertenece(faker.number().numberBetween(categoriaId.get(0),categoriaId.get(categoriaId.size() - 1)), ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)));
 
 
-//            //Creamos se_inscribe
+            //Creamos se_inscribe
             List<Integer> ids_socio = obtenerIds("select * from socio");
             List<Cronograma> ids_cronogramas = obtenerCronogramas();
             for (int i = 0; i < ids_socio.size() - 1; i++)
                 crearSeInscribe(ids_cronogramas.get(faker.number().numberBetween(0,ids_cronogramas.size()-1)), ids_socio.get(faker.number().numberBetween(0, ids_socio.size()-1)), new Date(faker.date().birthday(1,3).getTime()));
-//
 
+            //Creamos pago
+            List<SeInscribe> ids_seInscribe = obtenerSeInscribe();
+            for (int i =0; i < ids_seInscribe.size() - 1; i++){
+                crearPago(ids_seInscribe.get(i), 0, (float)faker.number().randomDouble(0, 500,5000), new Date(faker.date().birthday(1,3).getTime()));
+            }
 
-
-
-
-
-//            ResultSet rs=stmt.executeQuery("select * from categoria");
-//            while(rs.next())
-//                System.out.println(rs.getInt(1)+"  "+);
-
-//            String query = "INSERT INTO `club`.`pake2` (`id_pake`,`edad`) VALUES (?,?);";
-//            for (int i=2; i<10; i++){
-//                PreparedStatement preparedStmt = con.prepareStatement(query);
-//                preparedStmt.setInt (1, i);
-//                preparedStmt.setInt (2, i);
-//                preparedStmt.execute();
-//            }
             con.close();
         }catch(Exception e){ System.out.println(e);}
 
+    }
+
+    public static void crearPago(SeInscribe seInscribe, int idPago, float monto, Date fecha){
+
+        String query = "INSERT INTO `club`.`pago` VALUES (?,?,?,?,?,?,?,YEAR(?),?,?,?,?);";
+        try {
+
+            PreparedStatement preparedStmt = con.prepareStatement(query);
+            Cronograma cronograma = seInscribe.getCronograma();
+            preparedStmt.setInt (1, seInscribe.getId_socio());
+            preparedStmt.setInt (2, cronograma.getId_actividad());
+            preparedStmt.setInt (3, cronograma.getId_area());
+            preparedStmt.setInt (4, cronograma.getId_profesional());
+            preparedStmt.setString(5,cronograma.getDia());
+            preparedStmt.setTime(6,cronograma.getHora_inicio());
+            preparedStmt.setTime(7,cronograma.getHora_fin());
+            preparedStmt.setObject(8,cronograma.getPeriodo());
+            preparedStmt.setDate(9, seInscribe.getFecha_inscripcion());
+            preparedStmt.setInt(10, idPago);
+            preparedStmt.setFloat(11, monto);
+            preparedStmt.setDate(12,fecha);
+            preparedStmt.execute();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+    public static List<SeInscribe> obtenerSeInscribe(){
+
+        String query = "select * from se_inscribe";
+        List<SeInscribe> seInscribes = new ArrayList<>();
+        try {
+            ResultSet rs = stmt.executeQuery(query);
+            while(rs.next())
+                seInscribes.add(new SeInscribe(new Cronograma(rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getString(5), rs.getTime(6), rs.getTime(7), rs.getObject(8)), rs.getInt(1), rs.getDate(9)));
+            return seInscribes;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void crearSeInscribe(Cronograma cronograma, int idSocio, Date fecha_inscripcion){

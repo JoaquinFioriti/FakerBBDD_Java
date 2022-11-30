@@ -7,6 +7,7 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class Main {
 
@@ -28,6 +29,7 @@ public class Main {
 
 
             //Limpiamos la base de datos
+            deleteTable("se_inscribe");
             deleteTable("pertenece");
             deleteTable("cronograma");
             deleteTable("puede_desarrollar");
@@ -49,7 +51,7 @@ public class Main {
 
 
 
-//            deleteTable("se_inscribe");
+
 //            deleteTable("socio");
 
 
@@ -135,8 +137,18 @@ public class Main {
             for (int i = 0; i < ids_profesional.size(); i++)
                 cargarCronograma(ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)), ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)), ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)), diasName.get(faker.number().numberBetween(0, diasName.size()-1)), new Time(faker.date().birthday().getTime()), new Time(faker.date().birthday().getTime()), new Date((new SimpleDateFormat("yyyy-MM-dd")).parse("2022-10-10").getTime()));
 
-
             //Creamos pertenece
+            for (int i = 0; i < ids_actividad.size(); i++)
+                cargarPertenece(faker.number().numberBetween(categoriaId.get(0),categoriaId.get(categoriaId.size() - 1)), ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)));
+
+
+//            //Creamos se_inscribe
+//            List<Integer> ids_socio = obtenerIds("select * from socio");
+//            List<ResultSet> ids_cronogramas = obtenerCronogramas();
+//            for (int i = 0; i < ids_socio.size(); i++)
+//                crearSeInscribe(ids_cronogramas.get(faker.number().numberBetween(0,ids_cronogramas.size()-1)), ids_socio.get(faker.number().numberBetween(0, ids_socio.size())-1), new Date(faker.date().birthday(1,3).getTime()));
+
+
 
 
 
@@ -158,7 +170,37 @@ public class Main {
 
     }
 
-//    public static void cargar
+    public static void crearSeInscribe(ResultSet cronograma, int idSocio, Date fecha_inscripcion){
+        String query = "INSERT INTO `club`.`se_inscribe` VALUES (?,?,?,?,?,?,?,?,?);";
+        try {
+            PreparedStatement preparedStmt = con.prepareStatement(query);
+            preparedStmt.setInt (1, idSocio);
+            preparedStmt.setInt (2, cronograma.getInt(1));
+            preparedStmt.setInt (3, cronograma.getInt(2));
+            preparedStmt.setInt (4, cronograma.getInt(3));
+            preparedStmt.setString(5,cronograma.getString(5));
+            preparedStmt.setTime(6,cronograma.getTime(6));
+            preparedStmt.setTime(7,cronograma.getTime(7));
+            preparedStmt.setObject(8, cronograma.getObject(8));
+            preparedStmt.setDate(9, fecha_inscripcion);
+            preparedStmt.execute();
+        } catch (SQLException e) {
+
+        }
+    }
+
+    public static void cargarPertenece(int idCategoria, int idActividad){
+        String query = "INSERT INTO `club`.`pertenece` VALUES (?,?);";
+        try {
+            PreparedStatement preparedStmt = con.prepareStatement(query);
+            preparedStmt.setInt (1, idCategoria);
+            preparedStmt.setInt (2, idActividad);
+            preparedStmt.execute();
+        } catch (SQLException e) {
+
+        }
+
+    }
 
    public static void cargarCronograma(int idActividad, int idArea, int idProfesional, String dia, Time horaInicio, Time horaFin, Date periodo){
        String query = "INSERT INTO `club`.`cronograma` VALUES (?,?,?,?,?,?,YEAR(?));";
@@ -323,6 +365,19 @@ public class Main {
             while(rs.next())
                 ids.add(rs.getInt(1));
             return ids;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<ResultSet> obtenerCronogramas(){
+        String query = "select * from cronograma";
+        List<ResultSet> cronogramas = new ArrayList<>();
+        try {
+            ResultSet rs = stmt.executeQuery(query);
+            while(rs.next())
+                cronogramas.add(rs);
+            return cronogramas;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

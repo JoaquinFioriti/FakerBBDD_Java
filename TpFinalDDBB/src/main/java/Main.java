@@ -1,6 +1,8 @@
 import com.github.javafaker.Faker;
 
 import java.sql.*;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -25,6 +27,7 @@ public class Main {
 
 
             //Limpiamos la base de datos
+            deleteTable("cronograma");
             deleteTable("puede_desarrollar");
             deleteTable("puede_dar");
             deleteTable("area");
@@ -38,7 +41,6 @@ public class Main {
             //Falta indicar orden inverso al de creacion
 
 
-//            deleteTable("cronograma");
 //            deleteTable("cuota_social");
 //            deleteTable("pago");
 //            deleteTable("pertenece");
@@ -115,6 +117,11 @@ public class Main {
                 cargarPuedeDesarrollar(ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)), ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)) );
 
 
+            //Creamos cronograma
+            SimpleDateFormat dayNameFormat = new SimpleDateFormat("EEEE");
+            SimpleDateFormat horaFormat = new SimpleDateFormat("HH:mm:ss");
+            for (int i = 0; i < ids_profesional.size(); i++)
+                cargarCronograma( ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)),   ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)) ,  ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)) , dayNameFormat.format(faker.date().birthday()) , new Date(horaFormat.parse(horaFormat.format(faker.date().birthday())).getTime()), new Date(horaFormat.parse(horaFormat.format(faker.date().birthday())).getTime()), new Date(2000)  );
 
 
 
@@ -131,6 +138,25 @@ public class Main {
 //            }
             con.close();
         }catch(Exception e){ System.out.println(e);}
+
+    }
+
+    public static void cargarCronograma(int idActividad, int idArea, int idProfesional, String dia, Date hora_inicio, Date hora_fin, Date periodo){
+
+        String query = "INSERT INTO `club`.`cronograma` VALUES (?,?,?,?,?,?,?);";
+        try {
+            PreparedStatement preparedStmt = con.prepareStatement(query);
+            preparedStmt.setInt (1, idActividad);
+            preparedStmt.setInt (2, idArea);
+            preparedStmt.setInt (3, idProfesional);
+            preparedStmt.setString(4, dia);
+            preparedStmt.setDate(5, hora_inicio);
+            preparedStmt.setDate(6, hora_fin);
+            preparedStmt.setDate(7, periodo);
+            preparedStmt.execute();
+        } catch (SQLException e) {
+
+        }
 
     }
 

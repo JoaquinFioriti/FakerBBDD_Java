@@ -38,7 +38,7 @@ public class Main {
             deleteTable("profesional");
             deleteTable("actividad_arancelada");
             deleteTable("actividad");
-            deleteTable("grupo_familiar");
+//            deleteTable("grupo_familiar");
             deleteTable("socio_titular");
             deleteTable("socio");
             deleteTable("categoria");
@@ -47,13 +47,8 @@ public class Main {
 
 //            deleteTable("cuota_social");
 //            deleteTable("pago");
-
-
-
-
-
 //            deleteTable("socio");
-
+//            deleteTable("grupo_familiar");
 
 //            //Creamos las categorias
             cargarCategoria("infantiles", 1000);
@@ -143,11 +138,11 @@ public class Main {
 
 
 //            //Creamos se_inscribe
-//            List<Integer> ids_socio = obtenerIds("select * from socio");
-//            List<ResultSet> ids_cronogramas = obtenerCronogramas();
-//            for (int i = 0; i < ids_socio.size(); i++)
-//                crearSeInscribe(ids_cronogramas.get(faker.number().numberBetween(0,ids_cronogramas.size()-1)), ids_socio.get(faker.number().numberBetween(0, ids_socio.size())-1), new Date(faker.date().birthday(1,3).getTime()));
-
+            List<Integer> ids_socio = obtenerIds("select * from socio");
+            List<ResultSet> ids_cronogramas = obtenerCronogramas();
+            for (int i = 0; i < ids_socio.size() - 1; i++)
+                crearSeInscribe(ids_cronogramas.get(faker.number().numberBetween(0,ids_cronogramas.size()-1)), ids_socio.get(faker.number().numberBetween(0, ids_socio.size()-1)), new Date(faker.date().birthday(1,3).getTime()));
+//
 
 
 
@@ -171,18 +166,30 @@ public class Main {
     }
 
     public static void crearSeInscribe(ResultSet cronograma, int idSocio, Date fecha_inscripcion){
+
+        System.out.println("holaaa");
         String query = "INSERT INTO `club`.`se_inscribe` VALUES (?,?,?,?,?,?,?,?,?);";
         try {
+            System.out.println(cronograma);
+            System.out.println(cronograma.getInt(2));
+            System.out.println(cronograma.getInt(3));
+            System.out.println(cronograma.getString(4));
+            System.out.println(cronograma.getTime(5));
+            System.out.println(cronograma.getTime(6));
+            System.out.println(cronograma.getObject(7));
+
+
             PreparedStatement preparedStmt = con.prepareStatement(query);
             preparedStmt.setInt (1, idSocio);
-            preparedStmt.setInt (2, cronograma.getInt(1));
-            preparedStmt.setInt (3, cronograma.getInt(2));
-            preparedStmt.setInt (4, cronograma.getInt(3));
-            preparedStmt.setString(5,cronograma.getString(5));
-            preparedStmt.setTime(6,cronograma.getTime(6));
-            preparedStmt.setTime(7,cronograma.getTime(7));
-            preparedStmt.setObject(8, cronograma.getObject(8));
-            preparedStmt.setDate(9, fecha_inscripcion);
+            System.out.println(cronograma.getInt(1));
+            preparedStmt.setObject (2, cronograma.getObject(1));
+            preparedStmt.setObject (3, cronograma.getObject(2));
+            preparedStmt.setObject (4, cronograma.getObject(3));
+            preparedStmt.setObject(5,cronograma.getObject(4));
+            preparedStmt.setObject(6,cronograma.getObject(5));
+            preparedStmt.setObject(7,cronograma.getObject(6));
+            preparedStmt.setObject(8, cronograma.getObject(7));
+            preparedStmt.setObject(9, fecha_inscripcion);
             preparedStmt.execute();
         } catch (SQLException e) {
 
@@ -215,7 +222,7 @@ public class Main {
            preparedStmt.setObject(7,periodo);
            preparedStmt.execute();
        } catch (SQLException e) {
-
+           System.out.println(e.getMessage());
        }
    }
 

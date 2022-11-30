@@ -25,6 +25,8 @@ public class Main {
 
 
             //Limpiamos la base de datos
+            deleteTable("puede_desarrollar");
+            deleteTable("puede_dar");
             deleteTable("area");
             deleteTable("profesional");
             deleteTable("actividad_arancelada");
@@ -41,8 +43,8 @@ public class Main {
 //            deleteTable("pago");
 //            deleteTable("pertenece");
 
-//            deleteTable("puede_dar");
-//            deleteTable("puede_desarrollar");
+
+
 //            deleteTable("se_inscribe");
 //            deleteTable("socio");
 
@@ -99,6 +101,18 @@ public class Main {
                 cargarArea(faker.address().streetAddress(), faker.number().numberBetween(10,100), estados_mantenimiento.get(faker.number().numberBetween(0,estados_mantenimiento.size()-1)));
 
 
+            //Creamos puede_dar
+            List<Integer> ids_profesional = obtenerIds("select * from profesional");
+            List<Integer> ids_actividad = obtenerIds("select * from actividad");
+            for (int i = 0; i < ids_profesional.size(); i++)
+                cargarPuedeDar(ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)), ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)));
+
+
+
+            //Creamos puede_desarrollar
+            List<Integer> ids_area = obtenerIds("select * from area");
+            for (int i = 0; i < ids_area.size(); i++)
+                cargarPuedeDesarrollar(ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)), ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)) );
 
 
 
@@ -118,6 +132,31 @@ public class Main {
             con.close();
         }catch(Exception e){ System.out.println(e);}
 
+    }
+
+    public static void cargarPuedeDesarrollar(int idArea, int idActividad){
+
+        String query = "INSERT INTO `club`.`puede_desarrollar` VALUES (?,?);";
+        try {
+            PreparedStatement preparedStmt = con.prepareStatement(query);
+            preparedStmt.setInt (1, idArea);
+            preparedStmt.setInt (2, idActividad);
+            preparedStmt.execute();
+        } catch (SQLException e) {
+
+        }
+
+    }
+    public static void cargarPuedeDar(int idProfesional, int idActividad){
+        String query = "INSERT INTO `club`.`puede_dar` VALUES (?,?);";
+        try {
+            PreparedStatement preparedStmt = con.prepareStatement(query);
+            preparedStmt.setInt (1, idProfesional);
+            preparedStmt.setInt (2, idActividad);
+            preparedStmt.execute();
+        } catch (SQLException e) {
+
+        }
     }
 
     public static void cargarArea(String ubicacion, int capacidad, String estado_mantenimiento){

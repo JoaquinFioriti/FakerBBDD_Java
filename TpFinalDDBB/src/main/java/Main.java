@@ -61,7 +61,7 @@ public class Main {
             List<Integer> categoriaId = obtenerIds("select * from categoria");
             //Creamos socios
             for (int i = 0; i <100; i++)
-                cargarSocio(null, faker.number().numberBetween(categoriaId.get(0),categoriaId.get(categoriaId.size() - 1)), null, faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(), new Date(faker.date().birthday().getTime()), faker.bool().bool());
+                cargarSocio(null, faker.number().numberBetween(categoriaId.get(0),categoriaId.get(categoriaId.size() - 1)), faker.number().numberBetween(0,10),null, faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(), new Date(faker.date().birthday().getTime()), faker.bool().bool());
 
 
             //Creamos actividad
@@ -117,12 +117,12 @@ public class Main {
                 cargarPuedeDesarrollar(ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)), ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)) );
 
 
-            //Creamos cronograma
-            SimpleDateFormat dayNameFormat = new SimpleDateFormat("EEEE");
-            SimpleDateFormat horaFormat = new SimpleDateFormat("HH:mm:ss");
-            for (int i = 0; i < ids_profesional.size(); i++)
-                cargarCronograma( ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)),   ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)) ,  ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)) ,new Date(faker.date().birthday().getTime()), new Date(faker.date().birthday().getTime()), new Date(faker.date().birthday().getTime()),new Date(faker.date().birthday().getTime()) );
-
+//            //Creamos cronograma
+//            SimpleDateFormat dayNameFormat = new SimpleDateFormat("EEEE");
+//            SimpleDateFormat horaFormat = new SimpleDateFormat("HH:mm:ss");
+//            for (int i = 0; i < ids_profesional.size(); i++)
+//                cargarCronograma( ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)),   ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)) ,  ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)) ,new Date(faker.date().birthday().getTime()), new Date(faker.date().birthday().getTime()), new Date(faker.date().birthday().getTime()),new Date(faker.date().birthday().getTime()) );
+//
 
 
 
@@ -143,15 +143,22 @@ public class Main {
 
     }
 
-    public static void cargarCronograma(int idActividad, int idArea, int idProfesional, Date dia, Date hora_inicio, Date hora_fin, Date periodo){
+    public static void cargarCronograma(int idActividad, int idArea, int idProfesional, Date dia, Date hora_inicio, Date minutos_inicio ,Date hora_fin, Date minutos_fin,Date periodo){
 
-        String query = "INSERT INTO `club`.`cronograma` VALUES (?,?,?,?,?,?,?);";
+        String query = "INSERT INTO `club`.`cronograma` VALUES (?,?,?,DAYNAME(?),HOUR(?),MINUTE(?),HOUR(?),MINUTE(?),);";
         try {
             PreparedStatement preparedStmt = con.prepareStatement(query);
             preparedStmt.setInt (1, idActividad);
             preparedStmt.setInt (2, idArea);
             preparedStmt.setInt (3, idProfesional);
-            preparedStmt.setDate(4, dia);
+            preparedStmt.setObject(4, dia);
+            preparedStmt.setObject(5, hora_inicio);
+            preparedStmt.setObject(6, minutos_inicio);
+            preparedStmt.setObject(7, hora_fin);
+            preparedStmt.setObject(8, minutos_fin);
+
+
+
             preparedStmt.setDate(5, hora_inicio);
             preparedStmt.setDate(6, hora_fin);
             preparedStmt.setDate(7, periodo);
@@ -263,19 +270,20 @@ public class Main {
 
     }
 
-    public static void cargarSocio(Integer nro_base, int id_categoria, String num_celular, String nombre, String apellido, String email, Date fecha_nacimiento, boolean titularidad){
-        String query = "INSERT INTO `club`.`socio` VALUES (?,?,?,?,?,?,?,?,?);";
+    public static void cargarSocio(Integer nro_base, int id_categoria, int nro_orden, String num_celular, String nombre, String apellido, String email, Date fecha_nacimiento, boolean titularidad){
+        String query = "INSERT INTO `club`.`socio` VALUES (?,?,?,?,?,?,?,?,?,?);";
         try {
             PreparedStatement preparedStmt = con.prepareStatement(query);
             preparedStmt.setInt (1, 0);
             preparedStmt.setObject(2, nro_base);
-            preparedStmt.setInt (3, id_categoria);
-            preparedStmt.setObject(4, num_celular);
-            preparedStmt.setString (5, nombre);
-            preparedStmt.setString (6, apellido);
-            preparedStmt.setString (7, email);
-            preparedStmt.setDate(8, fecha_nacimiento);
-            preparedStmt.setBoolean(9, titularidad);
+            preparedStmt.setInt (3, nro_orden);
+            preparedStmt.setInt (4, id_categoria);
+            preparedStmt.setObject(5, num_celular);
+            preparedStmt.setString (6, nombre);
+            preparedStmt.setString (7, apellido);
+            preparedStmt.setString (8, email);
+            preparedStmt.setDate(9, fecha_nacimiento);
+            preparedStmt.setBoolean(10, titularidad);
             preparedStmt.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);

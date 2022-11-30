@@ -25,6 +25,7 @@ public class Main {
 
 
             //Limpiamos la base de datos
+            deleteTable("area");
             deleteTable("profesional");
             deleteTable("actividad_arancelada");
             deleteTable("actividad");
@@ -34,7 +35,7 @@ public class Main {
             deleteTable("categoria");
             //Falta indicar orden inverso al de creacion
 
-//            deleteTable("area");
+
 //            deleteTable("cronograma");
 //            deleteTable("cuota_social");
 //            deleteTable("pago");
@@ -84,6 +85,18 @@ public class Main {
             });
 
 
+            //Creamos profesional
+            for (int i = 0; i <40; i++)
+                cargarProfesional(faker.name().firstName(), faker.name().lastName(), faker.phoneNumber().cellPhone(), faker.internet().emailAddress(), new Date(faker.date().birthday().getTime()));
+
+
+            //Creamos area
+            List<String> estados_mantenimiento = new ArrayList<>();
+            estados_mantenimiento.add("Construccion");
+            estados_mantenimiento.add("Disponible");
+            estados_mantenimiento.add("Reparacion");
+            for (int i = 0; i <10; i++)
+                cargarArea(faker.address().streetAddress(), faker.number().numberBetween(10,100), estados_mantenimiento.get(faker.number().numberBetween(0,estados_mantenimiento.size()-1)));
 
 
 
@@ -105,6 +118,39 @@ public class Main {
             con.close();
         }catch(Exception e){ System.out.println(e);}
 
+    }
+
+    public static void cargarArea(String ubicacion, int capacidad, String estado_mantenimiento){
+
+        String query = "INSERT INTO `club`.`area` VALUES (?,?,?,?);";
+        try {
+            PreparedStatement preparedStmt = con.prepareStatement(query);
+            preparedStmt.setInt (1, 0);
+            preparedStmt.setString(2, ubicacion);
+            preparedStmt.setInt(3, capacidad);
+            preparedStmt.setString(4, estado_mantenimiento);
+            preparedStmt.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static void cargarProfesional(String nombre, String apellido, String telefono, String email, Date fecha_nacimiento){
+
+        String query = "INSERT INTO `club`.`profesional` VALUES (?,?,?,?,?,?);";
+        try {
+            PreparedStatement preparedStmt = con.prepareStatement(query);
+            preparedStmt.setInt (1, 0);
+            preparedStmt.setString(2, nombre);
+            preparedStmt.setString(3, apellido);
+            preparedStmt.setString(4, telefono);
+            preparedStmt.setString(5, email);
+            preparedStmt.setDate(6,fecha_nacimiento);
+            preparedStmt.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void cargarActividadArancelada(int id,float arancel, String tipo_cuota){

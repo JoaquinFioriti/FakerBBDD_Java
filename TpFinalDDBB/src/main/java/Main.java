@@ -3,6 +3,7 @@ import com.github.javafaker.Faker;
 import java.sql.*;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -118,11 +119,16 @@ public class Main {
 
 
 //            //Creamos cronograma
-//            SimpleDateFormat dayNameFormat = new SimpleDateFormat("EEEE");
-//            SimpleDateFormat horaFormat = new SimpleDateFormat("HH:mm:ss");
-//            for (int i = 0; i < ids_profesional.size(); i++)
-//                cargarCronograma( ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)),   ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)) ,  ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)) ,new Date(faker.date().birthday().getTime()), new Date(faker.date().birthday().getTime()), new Date(faker.date().birthday().getTime()),new Date(faker.date().birthday().getTime()) );
-//
+            List<String> diasName = new ArrayList<>();
+            diasName.add("Lunes");
+            diasName.add("Martes");
+            diasName.add("Miercoles");
+            diasName.add("Jueves");
+            diasName.add("Viernes");
+            diasName.add("Sabado");
+            diasName.add("Domingo");
+            for (int i = 0; i < ids_profesional.size(); i++)
+                cargarCronograma(ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)), ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)), ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)), diasName.get(faker.number().numberBetween(0, diasName.size()-1)), new Time(faker.date().birthday().getTime()), new Time(faker.date().birthday().getTime()), new Date(faker.date().birthday().getTime()));
 
 
 
@@ -143,31 +149,22 @@ public class Main {
 
     }
 
-    public static void cargarCronograma(int idActividad, int idArea, int idProfesional, Date dia, Date hora_inicio, Date minutos_inicio ,Date hora_fin, Date minutos_fin,Date periodo){
+   public static void cargarCronograma(int idActividad, int idArea, int idProfesional, String dia, Time horaInicio, Time horaFin, Date periodo){
+       String query = "INSERT INTO `club`.`cronograma` VALUES (?,?,?,?,?,?,YEAR(?));";
+       try {
+           PreparedStatement preparedStmt = con.prepareStatement(query);
+           preparedStmt.setInt (1, idActividad);
+           preparedStmt.setInt (2, idArea);
+           preparedStmt.setInt (3, idProfesional);
+           preparedStmt.setString(4, dia);
+           preparedStmt.setTime(5,horaInicio);
+           preparedStmt.setTime(6,horaFin);
+           preparedStmt.setObject(7,periodo);
+           preparedStmt.execute();
+       } catch (SQLException e) {
 
-        String query = "INSERT INTO `club`.`cronograma` VALUES (?,?,?,DAYNAME(?),HOUR(?),MINUTE(?),HOUR(?),MINUTE(?),);";
-        try {
-            PreparedStatement preparedStmt = con.prepareStatement(query);
-            preparedStmt.setInt (1, idActividad);
-            preparedStmt.setInt (2, idArea);
-            preparedStmt.setInt (3, idProfesional);
-            preparedStmt.setObject(4, dia);
-            preparedStmt.setObject(5, hora_inicio);
-            preparedStmt.setObject(6, minutos_inicio);
-            preparedStmt.setObject(7, hora_fin);
-            preparedStmt.setObject(8, minutos_fin);
-
-
-
-            preparedStmt.setDate(5, hora_inicio);
-            preparedStmt.setDate(6, hora_fin);
-            preparedStmt.setDate(7, periodo);
-            preparedStmt.execute();
-        } catch (SQLException e) {
-
-        }
-
-    }
+       }
+   }
 
     public static void cargarPuedeDesarrollar(int idArea, int idActividad){
 

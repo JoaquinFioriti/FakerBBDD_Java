@@ -25,19 +25,21 @@ public class Main {
 
 
             //Limpiamos la base de datos
+            deleteTable("profesional");
+            deleteTable("actividad_arancelada");
+            deleteTable("actividad");
             deleteTable("grupo_familiar");
             deleteTable("socio_titular");
             deleteTable("socio");
             deleteTable("categoria");
             //Falta indicar orden inverso al de creacion
-//            deleteTable("actividad");
-//            deleteTable("actividad_arancelada");
+
 //            deleteTable("area");
 //            deleteTable("cronograma");
 //            deleteTable("cuota_social");
 //            deleteTable("pago");
 //            deleteTable("pertenece");
-//            deleteTable("profesional");
+
 //            deleteTable("puede_dar");
 //            deleteTable("puede_desarrollar");
 //            deleteTable("se_inscribe");
@@ -56,6 +58,30 @@ public class Main {
             for (int i = 0; i <100; i++)
                 cargarSocio(null, faker.number().numberBetween(categoriaId.get(0),categoriaId.get(categoriaId.size() - 1)), null, faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(), new Date(faker.date().birthday().getTime()), faker.bool().bool());
 
+
+            //Creamos actividad
+            cargarActividad("Natacion", faker.bool().bool());
+            cargarActividad("Futbol", faker.bool().bool());
+            cargarActividad("Ping Pong", faker.bool().bool());
+            cargarActividad("Hockey", faker.bool().bool());
+            cargarActividad("Rugby", faker.bool().bool());
+            cargarActividad("Volley", faker.bool().bool());
+            cargarActividad("Handball", faker.bool().bool());
+
+
+
+
+            //Creamos actividad arancelada
+            List<Integer> actividadId = obtenerIds("select * from actividad a where a.modalidad = true");
+            List<String> tipos_cuota = new ArrayList<>();
+            tipos_cuota.add("Bimestral");
+            tipos_cuota.add("Semestral");
+            tipos_cuota.add("Cuatrimestral");
+            tipos_cuota.add("Mensual");
+            tipos_cuota.add("Anual");
+            actividadId.stream().forEach(idActividad -> {
+                cargarActividadArancelada(idActividad, (float)faker.number().randomDouble(0,1000,3000), tipos_cuota.get(faker.number().numberBetween(0,tipos_cuota.size()-1)));
+            });
 
 
 
@@ -79,6 +105,33 @@ public class Main {
             con.close();
         }catch(Exception e){ System.out.println(e);}
 
+    }
+
+    public static void cargarActividadArancelada(int id,float arancel, String tipo_cuota){
+
+        String query = "INSERT INTO `club`.`actividad_arancelada` VALUES (?,?,?);";
+        try {
+            PreparedStatement preparedStmt = con.prepareStatement(query);
+            preparedStmt.setInt (1, id);
+            preparedStmt.setFloat(2, arancel);
+            preparedStmt.setString(3, tipo_cuota);
+            preparedStmt.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void cargarActividad(String nombre, boolean modalidad){
+
+        String query = "INSERT INTO `club`.`actividad` VALUES (?,?,?);";
+        try {
+            PreparedStatement preparedStmt = con.prepareStatement(query);
+            preparedStmt.setInt (1, 0);
+            preparedStmt.setString(2, nombre);
+            preparedStmt.setBoolean(3, modalidad);
+            preparedStmt.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

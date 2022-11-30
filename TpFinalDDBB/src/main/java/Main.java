@@ -121,7 +121,9 @@ public class Main {
             SimpleDateFormat dayNameFormat = new SimpleDateFormat("EEEE");
             SimpleDateFormat horaFormat = new SimpleDateFormat("HH:mm:ss");
             for (int i = 0; i < ids_profesional.size(); i++)
-                cargarCronograma( ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)),   ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)) ,  ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)) , dayNameFormat.format(faker.date().birthday()) , new Date(horaFormat.parse(horaFormat.format(faker.date().birthday())).getTime()), new Date(horaFormat.parse(horaFormat.format(faker.date().birthday())).getTime()), new Date(2000)  );
+                cargarCronograma( ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)),   ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)) ,  ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)) ,new Date(faker.date().birthday().getTime()), new Date(faker.date().birthday().getTime()), new Date(faker.date().birthday().getTime()),new Date(faker.date().birthday().getTime()) );
+
+
 
 
 
@@ -141,7 +143,7 @@ public class Main {
 
     }
 
-    public static void cargarCronograma(int idActividad, int idArea, int idProfesional, String dia, Date hora_inicio, Date hora_fin, Date periodo){
+    public static void cargarCronograma(int idActividad, int idArea, int idProfesional, Date dia, Date hora_inicio, Date hora_fin, Date periodo){
 
         String query = "INSERT INTO `club`.`cronograma` VALUES (?,?,?,?,?,?,?);";
         try {
@@ -149,7 +151,7 @@ public class Main {
             preparedStmt.setInt (1, idActividad);
             preparedStmt.setInt (2, idArea);
             preparedStmt.setInt (3, idProfesional);
-            preparedStmt.setString(4, dia);
+            preparedStmt.setDate(4, dia);
             preparedStmt.setDate(5, hora_inicio);
             preparedStmt.setDate(6, hora_fin);
             preparedStmt.setDate(7, periodo);

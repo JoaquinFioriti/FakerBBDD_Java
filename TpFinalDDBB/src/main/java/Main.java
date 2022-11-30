@@ -29,12 +29,8 @@ public class Main {
 
 
             //Limpiamos la base de datos
-
             deleteTable("pago");
-
-
             deleteTable("cuota_social");
-
             deleteTable("se_inscribe");
             deleteTable("pertenece");
             deleteTable("cronograma");
@@ -44,7 +40,6 @@ public class Main {
             deleteTable("profesional");
             deleteTable("actividad_arancelada");
             deleteTable("actividad");
-
             deleteTable("socio_titular");
             deleteTable("socio");
             deleteTable("grupo_familiar");
@@ -52,7 +47,7 @@ public class Main {
 
 
 
-//            //Creamos las categorias
+            //Creamos las categorias
             cargarCategoria("infantil", (float) 0.9);
             cargarCategoria("mayor", 1);
             cargarCategoria("vitalicio", (float) 0.8);
@@ -145,7 +140,7 @@ public class Main {
 
 
             for (int i = 0; i < ids_profesional.size(); i++)
-                cargarCronograma(ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)), ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)), ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)), diasName.get(faker.number().numberBetween(0, diasName.size()-1)), new Time(faker.date().birthday().getTime()), new Time(faker.date().birthday().getTime()), new Date((new SimpleDateFormat("yyyy-MM-dd")).parse("2022-10-10").getTime()));
+                cargarCronograma(ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)), ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)), ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)), diasName.get(faker.number().numberBetween(0, diasName.size()-1)), new Time(faker.date().birthday().getTime()), new Time(faker.date().birthday().getTime()), new Date(faker.date().birthday(1,3).getTime()));
 
             //Creamos pertenece
             for (int i = 0; i < ids_actividad.size(); i++)

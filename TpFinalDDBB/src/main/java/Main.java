@@ -28,6 +28,7 @@ public class Main {
 
 
             //Limpiamos la base de datos
+            deleteTable("pertenece");
             deleteTable("cronograma");
             deleteTable("puede_desarrollar");
             deleteTable("puede_dar");
@@ -44,7 +45,7 @@ public class Main {
 
 //            deleteTable("cuota_social");
 //            deleteTable("pago");
-//            deleteTable("pertenece");
+
 
 
 
@@ -104,6 +105,7 @@ public class Main {
                 cargarArea(faker.address().streetAddress(), faker.number().numberBetween(10,100), estados_mantenimiento.get(faker.number().numberBetween(0,estados_mantenimiento.size()-1)));
 
 
+
             //Creamos puede_dar
             List<Integer> ids_profesional = obtenerIds("select * from profesional");
             List<Integer> ids_actividad = obtenerIds("select * from actividad");
@@ -118,7 +120,7 @@ public class Main {
                 cargarPuedeDesarrollar(ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)), ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)) );
 
 
-//            //Creamos cronograma
+            //Creamos cronograma
             List<String> diasName = new ArrayList<>();
             diasName.add("Lunes");
             diasName.add("Martes");
@@ -127,8 +129,15 @@ public class Main {
             diasName.add("Viernes");
             diasName.add("Sabado");
             diasName.add("Domingo");
+
+
+
             for (int i = 0; i < ids_profesional.size(); i++)
-                cargarCronograma(ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)), ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)), ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)), diasName.get(faker.number().numberBetween(0, diasName.size()-1)), new Time(faker.date().birthday().getTime()), new Time(faker.date().birthday().getTime()), new Date(faker.date().birthday().getTime()));
+                cargarCronograma(ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)), ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)), ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)), diasName.get(faker.number().numberBetween(0, diasName.size()-1)), new Time(faker.date().birthday().getTime()), new Time(faker.date().birthday().getTime()), new Date((new SimpleDateFormat("yyyy-MM-dd")).parse("2022-10-10").getTime()));
+
+
+            //Creamos pertenece
+
 
 
 
@@ -148,6 +157,8 @@ public class Main {
         }catch(Exception e){ System.out.println(e);}
 
     }
+
+//    public static void cargar
 
    public static void cargarCronograma(int idActividad, int idArea, int idProfesional, String dia, Time horaInicio, Time horaFin, Date periodo){
        String query = "INSERT INTO `club`.`cronograma` VALUES (?,?,?,?,?,?,YEAR(?));";

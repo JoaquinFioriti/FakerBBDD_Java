@@ -139,7 +139,7 @@ public class Main {
 
 //            //Creamos se_inscribe
             List<Integer> ids_socio = obtenerIds("select * from socio");
-            List<ResultSet> ids_cronogramas = obtenerCronogramas();
+            List<Cronograma> ids_cronogramas = obtenerCronogramas();
             for (int i = 0; i < ids_socio.size() - 1; i++)
                 crearSeInscribe(ids_cronogramas.get(faker.number().numberBetween(0,ids_cronogramas.size()-1)), ids_socio.get(faker.number().numberBetween(0, ids_socio.size()-1)), new Date(faker.date().birthday(1,3).getTime()));
 //
@@ -165,34 +165,24 @@ public class Main {
 
     }
 
-    public static void crearSeInscribe(ResultSet cronograma, int idSocio, Date fecha_inscripcion){
+    public static void crearSeInscribe(Cronograma cronograma, int idSocio, Date fecha_inscripcion){
 
-        System.out.println("holaaa");
-        String query = "INSERT INTO `club`.`se_inscribe` VALUES (?,?,?,?,?,?,?,?,?);";
+        String query = "INSERT INTO `club`.`se_inscribe` VALUES (?,?,?,?,?,?,?,YEAR(?),?);";
         try {
-            System.out.println(cronograma);
-            System.out.println(cronograma.getInt(2));
-            System.out.println(cronograma.getInt(3));
-            System.out.println(cronograma.getString(4));
-            System.out.println(cronograma.getTime(5));
-            System.out.println(cronograma.getTime(6));
-            System.out.println(cronograma.getObject(7));
-
 
             PreparedStatement preparedStmt = con.prepareStatement(query);
             preparedStmt.setInt (1, idSocio);
-            System.out.println(cronograma.getInt(1));
-            preparedStmt.setObject (2, cronograma.getObject(1));
-            preparedStmt.setObject (3, cronograma.getObject(2));
-            preparedStmt.setObject (4, cronograma.getObject(3));
-            preparedStmt.setObject(5,cronograma.getObject(4));
-            preparedStmt.setObject(6,cronograma.getObject(5));
-            preparedStmt.setObject(7,cronograma.getObject(6));
-            preparedStmt.setObject(8, cronograma.getObject(7));
-            preparedStmt.setObject(9, fecha_inscripcion);
+            preparedStmt.setInt (2, cronograma.getId_actividad());
+            preparedStmt.setInt (3, cronograma.getId_area());
+            preparedStmt.setInt (4, cronograma.getId_profesional());
+            preparedStmt.setString(5,cronograma.getDia());
+            preparedStmt.setTime(6,cronograma.getHora_inicio());
+            preparedStmt.setTime(7,cronograma.getHora_fin());
+            preparedStmt.setObject(8,cronograma.getPeriodo());
+            preparedStmt.setDate(9, fecha_inscripcion);
             preparedStmt.execute();
         } catch (SQLException e) {
-
+            System.out.println(e.getMessage());
         }
     }
 
@@ -377,13 +367,13 @@ public class Main {
         }
     }
 
-    public static List<ResultSet> obtenerCronogramas(){
+    public static List<Cronograma> obtenerCronogramas(){
         String query = "select * from cronograma";
-        List<ResultSet> cronogramas = new ArrayList<>();
+        List<Cronograma> cronogramas = new ArrayList<>();
         try {
             ResultSet rs = stmt.executeQuery(query);
             while(rs.next())
-                cronogramas.add(rs);
+                cronogramas.add(new Cronograma(rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getString(4), rs.getTime(5), rs.getTime(6), rs.getObject(7)));
             return cronogramas;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -392,3 +382,5 @@ public class Main {
 
 
 }
+
+

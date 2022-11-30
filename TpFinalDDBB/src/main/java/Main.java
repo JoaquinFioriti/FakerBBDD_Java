@@ -23,12 +23,14 @@ public class Main {
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
             con= DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/club","root","root");
+                    "jdbc:mysql://localhost:3306/club","root","");
             stmt=con.createStatement();
 
 
 
             //Limpiamos la base de datos
+
+            deleteTable("cuota_social");
             deleteTable("se_inscribe");
             deleteTable("pertenece");
             deleteTable("cronograma");
@@ -38,9 +40,9 @@ public class Main {
             deleteTable("profesional");
             deleteTable("actividad_arancelada");
             deleteTable("actividad");
-//            deleteTable("grupo_familiar");
             deleteTable("socio_titular");
             deleteTable("socio");
+            deleteTable("grupo_familiar");
             deleteTable("categoria");
             //Falta indicar orden inverso al de creacion
 
@@ -51,15 +53,28 @@ public class Main {
 //            deleteTable("grupo_familiar");
 
 //            //Creamos las categorias
-            cargarCategoria("infantiles", 1000);
-            cargarCategoria("mayores", 2000);
-            cargarCategoria("vitalicios", 3000);
+            cargarCategoria("infantil", (float) 0.9);
+            cargarCategoria("mayor", 1);
+            cargarCategoria("vitalicio", (float) 0.8);
 
 
 
             List<Integer> categoriaId = obtenerIds("select * from categoria");
+
+
+            for (int i = 1; i < 10; i++) {
+                cargarGrupoFamiliar(100*i,faker.address().streetAddress(),faker.phoneNumber().cellPhone());
+                cargarSocio(100*i, faker.number().numberBetween(categoriaId.get(1),categoriaId.get(categoriaId.size() - 1)), 0,faker.phoneNumber().cellPhone(), faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(), new Date(faker.date().birthday().getTime()), true);
+                for (int j = 1; j < 4; j++) {
+                    cargarSocio(100*i, faker.number().numberBetween(categoriaId.get(0),categoriaId.get(categoriaId.size() - 1)), faker.number().numberBetween(0,10),faker.phoneNumber().cellPhone(), faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(), new Date(faker.date().birthday().getTime()), false);
+                }
+            }
+
+
+
+
             //Creamos socios
-            for (int i = 0; i <100; i++)
+            for (int i = 0; i <20; i++)
                 cargarSocio(null, faker.number().numberBetween(categoriaId.get(0),categoriaId.get(categoriaId.size() - 1)), faker.number().numberBetween(0,10),null, faker.name().firstName(), faker.name().lastName(), faker.internet().emailAddress(), new Date(faker.date().birthday().getTime()), faker.bool().bool());
 
 
@@ -166,8 +181,6 @@ public class Main {
     }
 
     public static void crearSeInscribe(ResultSet cronograma, int idSocio, Date fecha_inscripcion){
-
-        System.out.println("holaaa");
         String query = "INSERT INTO `club`.`se_inscribe` VALUES (?,?,?,?,?,?,?,?,?);";
         try {
             System.out.println(cronograma);
@@ -205,6 +218,20 @@ public class Main {
             preparedStmt.execute();
         } catch (SQLException e) {
 
+        }
+
+    }
+
+    public static void cargarGrupoFamiliar(int nro_base,String domicilio, String telefono){
+        String query = "INSERT INTO `club`.`grupo_familiar` VALUES (?,?,?);";
+        try {
+            PreparedStatement preparedStmt = con.prepareStatement(query);
+            preparedStmt.setInt(1,nro_base);
+            preparedStmt.setString (2, domicilio);
+            preparedStmt.setString (3, telefono);
+            preparedStmt.execute();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
 
     }
@@ -343,7 +370,7 @@ public class Main {
             preparedStmt.setBoolean(10, titularidad);
             preparedStmt.execute();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getMessage());
         }
     }
 

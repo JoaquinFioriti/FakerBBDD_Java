@@ -23,18 +23,14 @@ public class Main {
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
             con= DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/club","root","root");
+                    "jdbc:mysql://localhost:3306/club","root","");
             stmt=con.createStatement();
 
-
+            /*
 
             //Limpiamos la base de datos
-
             deleteTable("pago");
-
-
             deleteTable("cuota_social");
-
             deleteTable("se_inscribe");
             deleteTable("pertenece");
             deleteTable("cronograma");
@@ -44,7 +40,6 @@ public class Main {
             deleteTable("profesional");
             deleteTable("actividad_arancelada");
             deleteTable("actividad");
-
             deleteTable("socio_titular");
             deleteTable("socio");
             deleteTable("grupo_familiar");
@@ -52,7 +47,7 @@ public class Main {
 
 
 
-//            //Creamos las categorias
+            //Creamos las categorias
             cargarCategoria("infantil", (float) 0.9);
             cargarCategoria("mayor", 1);
             cargarCategoria("vitalicio", (float) 0.8);
@@ -122,11 +117,6 @@ public class Main {
             //Creamos puede_dar
             List<Integer> ids_profesional = obtenerIds("select * from profesional");
             List<Integer> ids_actividad = obtenerIds("select * from actividad");
-
-
-
-
-
             for (int i = 0; i < ids_profesional.size(); i++)
                 cargarPuedeDar(ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)), ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)));
 
@@ -136,7 +126,6 @@ public class Main {
             List<Integer> ids_area = obtenerIds("select * from area");
             for (int i = 0; i < ids_area.size(); i++)
                 cargarPuedeDesarrollar(ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)), ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)) );
-
 
 
             //Creamos cronograma
@@ -209,7 +198,11 @@ public class Main {
                 crearPago(ids_seInscribe.get(i), 0, (float)faker.number().randomDouble(0, 500,5000), new Date(faker.date().birthday(1,3).getTime()));
             }
 
-            con.close();
+            */
+
+            Ventana frame = new Ventana();
+            frame.setVisible(true);
+//            con.close(); //TODO : hacerlo en la ventana on close
         }catch(Exception e){ System.out.println(e);}
 
     }
@@ -495,6 +488,42 @@ public class Main {
             throw new RuntimeException(e);
         }
     }
+
+
+
+    public static List<Socio> findAllSocios(String query){
+
+        List<Socio> socios = new ArrayList<>();
+        try {
+            ResultSet rs = stmt.executeQuery(query);
+            while(rs.next())
+                socios.add(new Socio(rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getDate(9), rs.getBoolean(10)));
+            return socios;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<Actividad> findAllActividades(String query){
+
+        List<Actividad> actividades = new ArrayList<>();
+        try {
+            ResultSet rs = stmt.executeQuery(query);
+            while(rs.next())
+                actividades.add(new Actividad(rs.getInt(1), rs.getString(2)));
+            return actividades;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+
+
+
+
+
 
 
 }

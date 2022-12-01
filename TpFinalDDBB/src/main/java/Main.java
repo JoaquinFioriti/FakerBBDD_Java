@@ -1,13 +1,9 @@
 import com.github.javafaker.Faker;
 
 import java.sql.*;
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class Main {
 
@@ -159,7 +155,11 @@ public class Main {
                 crearPago(ids_seInscribe.get(i), 0, (float)faker.number().randomDouble(0, 500,5000), new Date(faker.date().birthday(1,3).getTime()));
             }
 
-            con.close();
+
+
+            Ventana frame = new Ventana();
+            frame.setVisible(true);
+//            con.close(); //TODO : hacerlo en la ventana on close
         }catch(Exception e){ System.out.println(e);}
 
     }
@@ -432,6 +432,42 @@ public class Main {
             throw new RuntimeException(e);
         }
     }
+
+
+
+    public static List<Socio> findAllSocios(String query){
+
+        List<Socio> socios = new ArrayList<>();
+        try {
+            ResultSet rs = stmt.executeQuery(query);
+            while(rs.next())
+                socios.add(new Socio(rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getDate(9), rs.getBoolean(10)));
+            return socios;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<Actividad> findAllActividades(String query){
+
+        List<Actividad> actividades = new ArrayList<>();
+        try {
+            ResultSet rs = stmt.executeQuery(query);
+            while(rs.next())
+                actividades.add(new Actividad(rs.getInt(1), rs.getString(2)));
+            return actividades;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+
+
+
+
+
 
 
 }

@@ -89,6 +89,7 @@ public class Ventana extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 //TODO:HACER
                 List<Socio> socios = Main.findAllSocios("select * from socio");
+                modeloLista.clear();
                 modeloLista.addAll(socios);
             }
         });

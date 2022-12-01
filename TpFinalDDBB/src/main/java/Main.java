@@ -85,7 +85,8 @@ public class Main {
             cargarActividad("Hockey", faker.bool().bool());
             cargarActividad("Rugby", faker.bool().bool());
             cargarActividad("Volley", faker.bool().bool());
-            cargarActividad("Handball", faker.bool().bool());
+            cargarActividad("Handball", false);
+            cargarActividad("Basquet", false);
 
 
 
@@ -121,6 +122,11 @@ public class Main {
             //Creamos puede_dar
             List<Integer> ids_profesional = obtenerIds("select * from profesional");
             List<Integer> ids_actividad = obtenerIds("select * from actividad");
+
+
+
+
+
             for (int i = 0; i < ids_profesional.size(); i++)
                 cargarPuedeDar(ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)), ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)));
 
@@ -130,6 +136,7 @@ public class Main {
             List<Integer> ids_area = obtenerIds("select * from area");
             for (int i = 0; i < ids_area.size(); i++)
                 cargarPuedeDesarrollar(ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)), ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)) );
+
 
 
             //Creamos cronograma
@@ -142,10 +149,19 @@ public class Main {
             diasName.add("Sabado");
             diasName.add("Domingo");
 
+            List<Integer> ids_socio = obtenerIds("select * from socio");
+
+            List<Integer> ids_actividad_gratuitas = obtenerIds("select * from actividad a where a.modalidad = false");
+
 
 
             for (int i = 0; i < ids_profesional.size(); i++)
-                cargarCronograma(ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)), ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)), ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)), diasName.get(faker.number().numberBetween(0, diasName.size()-1)), new Time(faker.date().birthday().getTime()), new Time(faker.date().birthday().getTime()), new Date((new SimpleDateFormat("yyyy-MM-dd")).parse("2022-10-10").getTime()));
+                cargarCronograma(ids_actividad.get(faker.number().numberBetween(0, ids_actividad.size()-1)), ids_area.get(faker.number().numberBetween(0, ids_area.size()-1)),
+                        ids_profesional.get(faker.number().numberBetween(0, ids_profesional.size()-1)), diasName.get(faker.number().numberBetween(0, diasName.size()-1)),
+                        new Time(faker.date().birthday().getTime()), new Time(faker.date().birthday().getTime()), new Date((new SimpleDateFormat("yyyy-MM-dd")).parse("2022-10-10").getTime()));
+
+            cargarCronograma(ids_actividad.get(7-1),ids_area.get(0),ids_profesional.get(0),"Martes", new Time(faker.date().birthday().getTime()), new Time(faker.date().birthday().getTime()), new Date((new SimpleDateFormat("yyyy-MM-dd")).parse("2021-10-10").getTime()));
+            cargarCronograma(ids_actividad.get(8-1),ids_area.get(1),ids_profesional.get(1),"Miercoles", new Time(faker.date().birthday().getTime()), new Time(faker.date().birthday().getTime()), new Date((new SimpleDateFormat("yyyy-MM-dd")).parse("2021-10-10").getTime()));
 
             //Creamos pertenece
             for (int i = 0; i < ids_actividad.size(); i++)
@@ -153,10 +169,39 @@ public class Main {
 
 
             //Creamos se_inscribe
-            List<Integer> ids_socio = obtenerIds("select * from socio");
+
             List<Cronograma> ids_cronogramas = obtenerCronogramas();
             for (int i = 0; i < ids_socio.size() - 1; i++)
                 crearSeInscribe(ids_cronogramas.get(faker.number().numberBetween(0,ids_cronogramas.size()-1)), ids_socio.get(faker.number().numberBetween(0, ids_socio.size()-1)), new Date(faker.date().birthday(1,3).getTime()));
+
+            System.out.println("ARRANCA REQUERIMIENTO");
+            //REQUERIMIENTO DE INSCRIPCIONES GRATUITAS
+            for (int i = 0; i < ids_actividad_gratuitas.size(); i++) {
+
+                cargarPertenece(1,ids_actividad_gratuitas.get(i));
+                cargarPertenece(2,ids_actividad_gratuitas.get(i));
+                cargarPertenece(3,ids_actividad_gratuitas.get(i));
+                cargarPuedeDar(ids_profesional.get(i),ids_actividad_gratuitas.get(i));
+                cargarPuedeDesarrollar(ids_area.get(i),ids_actividad_gratuitas.get(i));
+                cargarCronograma(ids_actividad_gratuitas.get(i),ids_area.get(i),ids_profesional.get(i),diasName.get(faker.number().numberBetween(0, diasName.size()-1)),
+                        new Time(faker.date().birthday().getTime()), new Time(faker.date().birthday().getTime()), new Date((new SimpleDateFormat("yyyy-MM-dd")).parse("2021-10-10").getTime()));
+            }
+            List<Cronograma> ids_cronogramas_gratuitos = obtenerCronogramas(",actividad a where c.id_actividad = a.id_actividad and a.modalidad = false");
+
+            for (int i = 0; i < ids_cronogramas_gratuitos.size() ; i++) {
+                crearSeInscribe(ids_cronogramas_gratuitos.get(i),ids_socio.get(1),new Date(faker.date().birthday(1,3).getTime()));
+            }
+            for (int i = 0; i < ids_cronogramas_gratuitos.size() ; i++) {
+                crearSeInscribe(ids_cronogramas_gratuitos.get(i),ids_socio.get(9),new Date(faker.date().birthday(1,3).getTime()));
+            }
+            for (int i = 0; i < ids_cronogramas_gratuitos.size() ; i++) {
+                crearSeInscribe(ids_cronogramas_gratuitos.get(i),ids_socio.get(8),new Date(faker.date().birthday(1,3).getTime()));
+            }
+            for (int i = 0; i < ids_cronogramas_gratuitos.size() ; i++) {
+                crearSeInscribe(ids_cronogramas_gratuitos.get(i),ids_socio.get(6),new Date(faker.date().birthday(1,3).getTime()));
+            }
+            //REQUERIMIENTO DE INSCRIPCIONES GRATUITAS
+
 
             //Creamos pago
             List<SeInscribe> ids_seInscribe = obtenerSeInscribe();
@@ -426,7 +471,20 @@ public class Main {
     }
 
     public static List<Cronograma> obtenerCronogramas(){
-        String query = "select * from cronograma";
+        String query = "select * from cronograma " ;
+        List<Cronograma> cronogramas = new ArrayList<>();
+        try {
+            ResultSet rs = stmt.executeQuery(query);
+            while(rs.next())
+                cronogramas.add(new Cronograma(rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getString(4), rs.getTime(5), rs.getTime(6), rs.getObject(7)));
+            return cronogramas;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<Cronograma> obtenerCronogramas(String condition){
+        String query = "select * from cronograma c" + condition;
         List<Cronograma> cronogramas = new ArrayList<>();
         try {
             ResultSet rs = stmt.executeQuery(query);
